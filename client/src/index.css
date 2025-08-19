@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+	height: 100%;
+}
+
+:root {
+	--bg-from: #0f172a;
+	--bg-to: #0b1220;
+}
+
+body {
+	margin: 0;
+	font-family: 'Cairo', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+	direction: rtl;
+	background: radial-gradient(1200px 600px at 80% -10%, #0ea5e920 0%, transparent 60%),
+		linear-gradient(180deg, var(--bg-from), var(--bg-to));
+	color: #e2e8f0;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 999px; }
+::-webkit-scrollbar-track { background: #0b1220; }

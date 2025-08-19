@@ -1,0 +1,22 @@
+# dependencies
+client/node_modules/
+server/node_modules/
+
+# env and local data
+server/.env
+server/data.db
+server/uploads/
+
+# logs
+**/npm-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+# build outputs
+client/dist/
+**/.vite/
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+*.swp 
