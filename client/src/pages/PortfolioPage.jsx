@@ -7,8 +7,7 @@ import { WeeklyProgressChart, CoursesDistribution } from '../components/Charts.j
 import Heatmap from '../components/Heatmap.jsx'
 import { authHeader } from '../lib/auth.js'
 import { useNavigate } from 'react-router-dom'
-
-const API_BASE = 'http://localhost:4000'
+import { API_BASE } from '../lib/config.js'
 
 export default function PortfolioPage() {
 	const [student, setStudent] = useState(null)

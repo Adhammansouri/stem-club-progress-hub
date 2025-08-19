@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { authHeader } from '../lib/auth.js'
-
-const API_BASE = 'http://localhost:4000'
+import { API_BASE } from '../lib/config.js'
 
 export default function Heatmap() {
 	const [logs, setLogs] = useState([])

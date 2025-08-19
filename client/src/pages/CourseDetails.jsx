@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
-
-const API_BASE = 'http://localhost:4000'
+import { API_BASE } from '../lib/config.js'
+import { authHeader } from '../lib/auth.js'
 
 export default function CourseDetails() {
 	const { id } = useParams()
@@ -18,7 +18,7 @@ export default function CourseDetails() {
 	async function load() {
 		setLoading(true)
 		try {
-			const res = await fetch(`${API_BASE}/api/courses/${id}`)
+			const res = await fetch(`${API_BASE}/api/courses/${id}`, { headers: { ...authHeader() } })
 			if (!res.ok) throw new Error('تعذر جلب الكورس')
 			setCourse(await res.json())
 		} catch (e) {
@@ -29,7 +29,7 @@ export default function CourseDetails() {
 
 	async function setDoneCount(count) {
 		const res = await fetch(`${API_BASE}/api/courses/${id}`, {
-			method: 'PUT', headers: { 'Content-Type': 'application/json' },
+			method: 'PUT', headers: { 'Content-Type': 'application/json', ...authHeader() },
 			body: JSON.stringify({ lectures_done: count })
 		})
 		if (!res.ok) return toast.error('تعذر التحديث')

@@ -3,8 +3,7 @@ import { toast } from 'react-hot-toast'
 import { FaGithub, FaFacebook, FaLinkedin, FaUpload } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { authHeader } from '../lib/auth.js'
-
-const API_BASE = 'http://localhost:4000'
+import { API_BASE } from '../lib/config.js'
 
 export default function ProfilePage() {
 	const navigate = useNavigate()

@@ -3,8 +3,7 @@ import { toast } from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 import { authHeader } from '../lib/auth.js'
 import AchievementsBar from '../components/AchievementsBar.jsx'
-
-const API_BASE = 'http://localhost:4000'
+import { API_BASE } from '../lib/config.js'
 
 export default function CoursesPage() {
 	const [courses, setCourses] = useState([])

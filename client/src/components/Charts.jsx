@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend, LabelList } from 'recharts'
 import { authHeader } from '../lib/auth.js'
+import { API_BASE } from '../lib/config.js'
 
-const API_BASE = 'http://localhost:4000'
 const COLORS = ['#10b981', '#60a5fa', '#f59e0b', '#ef4444', '#a78bfa', '#22d3ee']
 
 function formatDateLabel(dStr) {
