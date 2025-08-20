@@ -421,6 +421,33 @@ app.get('/api/export', auth, (req, res) => {
 	res.json({ student, courses, projects });
 });
 
+// Share token for public portfolio view (valid 30 days)
+app.get('/api/portfolio/share-token', auth, (req, res) => {
+	try {
+		const token = jwt.sign({ uid: Number(req.userId), typ: 'share' }, JWT_SECRET, { expiresIn: '30d' });
+		res.json({ token });
+	} catch {
+		res.status(500).json({ error: 'Failed to generate token' });
+	}
+});
+
+// Public portfolio (no auth) – requires share token
+app.get('/api/public/portfolio', (req, res) => {
+	const token = String(req.query.token || '');
+	if (!token) return res.status(400).json({ error: 'token required' });
+	try {
+		const payload = jwt.verify(token, JWT_SECRET);
+		if (!payload || payload.typ !== 'share' || !payload.uid) return res.status(401).json({ error: 'invalid token' });
+		const uid = Number(payload.uid);
+		const student = db.prepare('SELECT * FROM profile WHERE user_id = ?').get(uid) || {};
+		const courses = db.prepare('SELECT * FROM course WHERE user_id = ? ORDER BY id DESC').all(uid);
+		const projects = db.prepare('SELECT * FROM project WHERE user_id = ? ORDER BY sort_order ASC, id DESC').all(uid);
+		res.json({ student, courses, projects });
+	} catch {
+		return res.status(401).json({ error: 'invalid token' });
+	}
+});
+
 app.get('/api/progress', auth, (req, res) => {
 	const rows = db.prepare('SELECT * FROM progress_log WHERE user_id = ? ORDER BY date ASC, id ASC').all(Number(req.userId));
 	res.json(rows);
