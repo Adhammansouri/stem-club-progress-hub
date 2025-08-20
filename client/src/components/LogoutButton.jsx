@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { clearToken, getUser } from '../lib/auth.js'
+import { clearToken } from '../lib/auth.js'
 import { toast } from 'react-hot-toast'
 
 export default function LogoutButton() {
 	const [loading, setLoading] = useState(false)
-	const user = getUser()
 
 	function doLogout() {
 		if (loading) return
@@ -18,15 +17,15 @@ export default function LogoutButton() {
 		<button
 			onClick={doLogout}
 			disabled={loading}
-			className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md transition-all bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-sm sm:text-base ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+			className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md transition-colors bg-rose-600 hover:bg-rose-500 text-white text-sm sm:text-base ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
 		>
 			{loading ? (
 				<span className="inline-flex items-center gap-1 sm:gap-2">
-					<span className="inline-block w-3 h-3 rounded-full border-2 border-slate-200 border-t-transparent animate-spin"></span>
+					<span className="inline-block w-3 h-3 rounded-full border-2 border-white/80 border-t-transparent animate-spin"></span>
 					<span>جارٍ الخروج...</span>
 				</span>
 			) : (
-				<span>تسجيل الخروج{user?.email ? ` (${user.email})` : ''}</span>
+				<span>تسجيل الخروج</span>
 			)}
 		</button>
 	)
