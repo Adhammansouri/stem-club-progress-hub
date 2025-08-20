@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function LogoLoader({ show = false }) {
-	const logoSrc = import.meta.env.BASE_URL + 'stem-club.png'
+	const logoSrc = import.meta.env.BASE_URL + 'stem-club-load.png'
 	return (
 		<AnimatePresence>
 			{show && (
