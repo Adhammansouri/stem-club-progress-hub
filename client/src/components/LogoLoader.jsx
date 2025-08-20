@@ -1,7 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
 
 export default function LogoLoader({ show = false }) {
-	const logoSrc = import.meta.env.BASE_URL + 'stem-club-load.png'
+	const primary = import.meta.env.BASE_URL + 'stem-club-load.png'
+	const fallback = import.meta.env.BASE_URL + 'stem-club.png'
+	const [src, setSrc] = useState(primary)
 	return (
 		<AnimatePresence>
 			{show && (
@@ -12,7 +15,8 @@ export default function LogoLoader({ show = false }) {
 						{/* Logo circle */}
 						<motion.div className="relative w-28 h-28 rounded-full grid place-items-center bg-slate-900 border-4 border-slate-700 shadow-xl"
 							initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 18 }}>
-							<motion.img src={logoSrc} alt="STEM Club" className="w-16 h-auto select-none" draggable={false}
+							<motion.img src={src} alt="STEM Club" className="w-16 h-auto select-none" draggable={false}
+								onError={() => setSrc(fallback)}
 								initial={{ y: 0 }} animate={{ y: [0, -6, 0] }} transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }} />
 						</motion.div>
 					</div>
