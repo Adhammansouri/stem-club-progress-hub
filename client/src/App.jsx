@@ -26,7 +26,7 @@ function App() {
       <header className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur border-b border-slate-800">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to={logged ? "/portfolio" : "/login"} className="flex items-center gap-2">
-            <img src="/stem-club.png" alt="STEM Club" className="h-8 w-auto" />
+            <img src={import.meta.env.BASE_URL + 'stem-club.png'} alt="STEM Club" className="h-8 w-auto" />
             <h1 className="text-xl font-bold">منصة STEM Club</h1>
           </Link>
           <nav className="flex items-center gap-4">
