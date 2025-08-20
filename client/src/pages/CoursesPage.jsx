@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { authHeader } from '../lib/auth.js'
 import AchievementsBar from '../components/AchievementsBar.jsx'
 import { API_BASE } from '../lib/config.js'
@@ -9,19 +9,19 @@ import { FaCode, FaRobot, FaPython, FaMobileAlt, FaShieldAlt, FaPaintBrush, FaLa
 import { SiJavascript, SiFlutter, SiArduino } from 'react-icons/si'
 
 const CATALOG = [
-	{ title: 'Web Development Course', icon: FaCode, colors: 'from-emerald-400 to-sky-500' },
-	{ title: 'Robotics', icon: FaRobot, colors: 'from-purple-400 to-rose-500' },
-	{ title: 'Python Course', icon: FaPython, colors: 'from-yellow-400 to-emerald-500' },
-	{ title: 'Mobile App Course', icon: FaMobileAlt, colors: 'from-sky-400 to-indigo-500' },
-	{ title: 'JavaScript Course', icon: SiJavascript, colors: 'from-amber-400 to-orange-500' },
-	{ title: 'ICT', icon: FaNetworkWired, colors: 'from-cyan-400 to-blue-500' },
-	{ title: 'Graphic Design Course', icon: FaPaintBrush, colors: 'from-pink-400 to-rose-500' },
-	{ title: 'flutter', icon: SiFlutter, colors: 'from-sky-400 to-cyan-500' },
-	{ title: 'Cyber security', icon: FaShieldAlt, colors: 'from-rose-400 to-red-500' },
-	{ title: 'Computer Science Course', icon: FaLaptopCode, colors: 'from-indigo-400 to-violet-500' },
-	{ title: 'Cody Rocky Robot Course', icon: FaRobot, colors: 'from-fuchsia-400 to-pink-500' },
-	{ title: 'Artificial Intelligence Course', icon: FaBrain, colors: 'from-emerald-400 to-lime-500' },
-	{ title: 'Arduino Course', icon: SiArduino, colors: 'from-teal-400 to-emerald-500' },
+	{ title: 'Web Development Course', icon: FaCode, colors: 'from-emerald-400 to-sky-500', desc: 'أساسيات بناء مواقع الويب العصرية: HTML, CSS, JavaScript مع مبادئ تصميم واجهات جذابة وتجربة مستخدم ممتعة.' },
+	{ title: 'Robotics', icon: FaRobot, colors: 'from-purple-400 to-rose-500', desc: 'تعلم مبادئ الميكاترونكس والتحكم في الروبوتات من خلال مشاريع ممتعة وأجهزة استشعار ومحركات.' },
+	{ title: 'Python Course', icon: FaPython, colors: 'from-yellow-400 to-emerald-500', desc: 'ابدأ البرمجة بلغة بايثون بطريقة مبسطة: من الأساسيات حتى بناء سكربتات وتطبيقات صغيرة عملية.' },
+	{ title: 'Mobile App Course', icon: FaMobileAlt, colors: 'from-sky-400 to-indigo-500', desc: 'مدخل لتطوير تطبيقات الموبايل مع أفضل الممارسات وتجربة المستخدم على أنظمة متعددة.' },
+	{ title: 'JavaScript Course', icon: SiJavascript, colors: 'from-amber-400 to-orange-500', desc: 'أتقن لغة الويب الأشهر JS لبناء واجهات تفاعلية وفهم البرمجة غير المتزامنة.' },
+	{ title: 'ICT', icon: FaNetworkWired, colors: 'from-cyan-400 to-blue-500', desc: 'أساسيات تكنولوجيا المعلومات والاتصالات: الشبكات، البروتوكولات، والعمل التعاوني الرقمي.' },
+	{ title: 'Graphic Design Course', icon: FaPaintBrush, colors: 'from-pink-400 to-rose-500', desc: 'إبداع بصري: مبادئ التصميم، الألوان، الطباعة، والتكوين مع تطبيقات عملية.' },
+	{ title: 'flutter', icon: SiFlutter, colors: 'from-sky-400 to-cyan-500', desc: 'بناء تطبيقات موبايل جميلة بأداء عالٍ عبر إطار Flutter من جوجل من كود واحد.' },
+	{ title: 'Cyber security', icon: FaShieldAlt, colors: 'from-rose-400 to-red-500', desc: 'تعرف على أساسيات أمن المعلومات، التهديدات الشائعة، وكيفية حماية الأنظمة والمستخدمين.' },
+	{ title: 'Computer Science Course', icon: FaLaptopCode, colors: 'from-indigo-400 to-violet-500', desc: 'مفاهيم علوم الحاسب: الخوارزميات، هياكل البيانات، والتفكير الحاسوبي.' },
+	{ title: 'Cody Rocky Robot Course', icon: FaRobot, colors: 'from-fuchsia-400 to-pink-500', desc: 'برمجة روبوت Cody Rocky بأنشطة مرحة تحفّز التفكير والإبداع.' },
+	{ title: 'Artificial Intelligence Course', icon: FaBrain, colors: 'from-emerald-400 to-lime-500', desc: 'مدخل إلى الذكاء الاصطناعي: التعلم الآلي، الرؤية الحاسوبية، وتطبيقات يومية.' },
+	{ title: 'Arduino Course', icon: SiArduino, colors: 'from-teal-400 to-emerald-500', desc: 'برمجة المتحكم Arduino لبناء دوائر ومشاريع إلكترونية تفاعلية.' },
 ]
 
 export default function CoursesPage() {
@@ -29,6 +29,7 @@ export default function CoursesPage() {
 	const [newCourse, setNewCourse] = useState({ title: '', total_levels: 6, lectures_done: 0 })
 	const [loading, setLoading] = useState(true)
 	const [recentAwards, setRecentAwards] = useState([])
+	const [openIdx, setOpenIdx] = useState(null)
 
 	async function load() {
 		setLoading(true)
@@ -104,9 +105,11 @@ export default function CoursesPage() {
 					{CATALOG.map((item, idx) => {
 						const Icon = item.icon
 						const isEnrolled = enrolledTitles.has(item.title)
+						const isOpen = openIdx === idx
 						return (
-							<motion.div key={idx} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx*0.03 }}
-								className="group relative overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/60 hover:bg-slate-800/80">
+							<motion.div key={idx} layout initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx*0.03 }}
+								className="group relative overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/60 hover:bg-slate-800/80 cursor-pointer"
+								onClick={()=> setOpenIdx(isOpen ? null : idx)}>
 								<div className={`absolute -inset-0.5 bg-gradient-to-r ${item.colors} opacity-20 blur-2xl group-hover:opacity-30 transition-opacity`} />
 								<div className="relative p-4 flex items-center gap-4">
 									<div className={`w-12 h-12 rounded-xl grid place-items-center text-2xl text-white bg-gradient-to-br ${item.colors} shadow-lg shadow-emerald-500/10`}> <Icon /> </div>
@@ -114,8 +117,21 @@ export default function CoursesPage() {
 										<div className="font-semibold">{item.title}</div>
 										<div className="text-xs text-slate-400">5 ليفلات • 20 سيشن</div>
 									</div>
-									<button disabled={isEnrolled} onClick={()=> enroll(item.title)} className={`px-3 py-1.5 rounded-md text-sm ${isEnrolled ? 'bg-slate-700 text-slate-300 cursor-not-allowed' : 'bg-brand hover:bg-brand-dark'} transition-colors`}>{isEnrolled ? 'مسجّل' : 'انضم'}</button>
+									<button onClick={(e)=> { e.stopPropagation(); if (!isEnrolled) enroll(item.title) }} disabled={isEnrolled} className={`px-3 py-1.5 rounded-md text-sm ${isEnrolled ? 'bg-slate-700 text-slate-300 cursor-not-allowed' : 'bg-brand hover:bg-brand-dark'} transition-colors`}>{isEnrolled ? 'مسجّل' : 'انضم'}</button>
 								</div>
+								<AnimatePresence initial={false}>
+									{isOpen && (
+										<motion.div key="details" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ type: 'tween', duration: 0.35 }} className="relative px-4 pb-4 text-sm text-slate-300">
+											<p className="leading-relaxed">{item.desc}</p>
+											<div className="grid grid-cols-2 gap-2 mt-3 text-xs">
+												<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• 5 ليفلات</div>
+												<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• 20 سيشن</div>
+												<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• مشاريع صغيرة ممتعة</div>
+												<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• شهادة إنجاز</div>
+											</div>
+										</motion.div>
+									)}
+								</AnimatePresence>
 							</motion.div>
 						)
 					})}
