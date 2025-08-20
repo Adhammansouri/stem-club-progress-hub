@@ -213,6 +213,8 @@ app.post('/api/auth/seed-demo', (req, res) => {
 			delta INTEGER NOT NULL
 		)`);
 	} catch {}
+	// Ensure user_id column exists even if the table was created before ownership migration
+	try { db.exec(`ALTER TABLE progress_log ADD COLUMN user_id INTEGER`); } catch {}
 })();
 
 function computeCourseDerived(totalLevels, lecturesDone) {
