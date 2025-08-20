@@ -23,17 +23,19 @@ const ALLOWED_ORIGINS = new Set([
     'http://localhost:5173',
     'http://127.0.0.1:5173'
 ]);
-app.use(cors({
+const corsOptions = {
     origin: (origin, callback) => {
         if (!origin) return callback(null, true);
         if (ALLOWED_ORIGINS.has(origin)) return callback(null, true);
-        return callback(null, false);
+        return callback(new Error('Not allowed by CORS'));
     },
     methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-// Ensure preflight responses include CORS headers
-app.options('*', cors());
+    credentials: true,
+};
+app.use(cors(corsOptions));
+// Ensure preflight responses include our CORS headers
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use('/uploads', express.static(UPLOAD_DIR));
 
