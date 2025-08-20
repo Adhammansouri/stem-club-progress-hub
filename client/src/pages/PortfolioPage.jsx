@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { FaGithub, FaFacebook, FaLinkedin } from 'react-icons/fa'
+import { FaGithub, FaFacebook, FaLinkedin, FaDownload, FaShareAlt } from 'react-icons/fa'
 import Stat from '../components/Stat.jsx'
 import RadialProgress from '../components/RadialProgress.jsx'
 import { WeeklyProgressChart, CoursesDistribution } from '../components/Charts.jsx'
@@ -46,67 +46,88 @@ export default function PortfolioPage() {
 
 	async function copyLink() {
 		try {
+			// fallback to current URL; could be extended later to a public share token
 			await navigator.clipboard.writeText(window.location.href)
 			setCopied(true)
 			setTimeout(()=> setCopied(false), 1500)
 		} catch {}
 	}
 
+	async function exportJson() {
+		try {
+			const r = await fetch(`${API_BASE}/api/export`, { headers: { ...authHeader() } })
+			if (!r.ok) throw new Error('تعذر التصدير')
+			const data = await r.json()
+			const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+			const a = document.createElement('a')
+			a.href = URL.createObjectURL(blob)
+			a.download = 'portfolio-export.json'
+			a.click()
+		} catch {}
+	}
+
 	return (
-		<div className="space-y-6 sm:space-y-10">
-			<motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 relative">
-				<div className="flex flex-col items-center gap-4 sm:gap-6">
-					<div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden ring-2 ring-brand/50 shadow-lg shadow-emerald-500/10">
+		<div className="space-y-8 sm:space-y-10">
+			{/* Hero */}
+			<section className="relative overflow-hidden rounded-3xl border border-slate-700 bg-gradient-to-br from-slate-800/70 via-slate-800/40 to-slate-900/80 p-6 sm:p-8">
+				<div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 bg-emerald-500/20 blur-3xl rounded-full" />
+				<div className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 bg-sky-500/20 blur-3xl rounded-full" />
+				<div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-6">
+					<div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden ring-2 ring-brand/50 shadow-lg shadow-emerald-500/10">
 						{student?.avatar ? (
 							<img src={`${API_BASE}${student.avatar}`} alt="avatar" className="w-full h-full object-cover" />
 						) : (
-							<div className="w-full h-full grid place-items-center bg-slate-700 text-slate-300 text-xs sm:text-sm">بدون صورة</div>
+							<div className="w-full h-full grid place-items-center bg-slate-700 text-slate-300">بدون صورة</div>
 						)}
 					</div>
-					<div className="text-center space-y-2">
-						<h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">{student?.name || 'طالب مجهول'}</h2>
-						<div className="text-sm sm:text-base text-slate-300 px-2">{student?.bio || 'ابدأ بتعريف نفسك، مهاراتك، وأهدافك.'}</div>
-						<div className="flex items-center justify-center gap-3 text-sm text-slate-300">
-							{student?.github && <a className="hover:text-white" href={student.github} target="_blank" rel="noreferrer">GitHub</a>}
-							{student?.facebook && <a className="hover:text-white" href={student.facebook} target="_blank" rel="noreferrer">Facebook</a>}
-							{student?.linkedin && <a className="hover:text-white" href={student.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>}
+					<div className="text-center sm:text-right space-y-2 flex-1 min-w-0">
+						<h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{student?.name || 'طالب مجهول'}</h2>
+						<p className="text-slate-300 text-sm sm:text-base">{student?.bio || 'ابدأ بتعريف نفسك، مهاراتك، وأهدافك.'}</p>
+						<div className="flex items-center justify-center sm:justify-start gap-3 text-slate-300">
+							{student?.github && <a className="hover:text-white" href={student.github} target="_blank" rel="noreferrer"><FaGithub /></a>}
+							{student?.facebook && <a className="hover:text-white" href={student.facebook} target="_blank" rel="noreferrer"><FaFacebook /></a>}
+							{student?.linkedin && <a className="hover:text-white" href={student.linkedin} target="_blank" rel="noreferrer"><FaLinkedin /></a>}
 						</div>
 					</div>
-					<div className="w-full sm:w-auto">
-						<button onClick={copyLink} className="w-full sm:w-auto px-4 py-2 rounded-md bg-brand hover:bg-brand-dark text-sm">{copied ? 'تم النسخ' : 'مشاركة'}</button>
+					<div className="sm:ml-auto flex gap-3">
+						<button onClick={copyLink} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-brand hover:bg-brand-dark"><FaShareAlt /> {copied ? 'تم النسخ' : 'مشاركة'}</button>
+						<button onClick={exportJson} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-slate-700 hover:bg-slate-600"><FaDownload /> تصدير</button>
 					</div>
 				</div>
-				<div className="grid grid-cols-2 gap-2 sm:gap-3 mt-4 sm:mt-6">
+				{/* Stats */}
+				<div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
 					<Stat label="الكورسات" value={courses.length} />
 					<Stat label="المشاريع" value={projects.length} />
 					<Stat label="المحاضرات" value={`${doneLectures}/${totalLectures}`} helper="منجَزة/الإجمالي" />
 					<Stat label="أفضل تقدم" value={`${Math.max(0, ...courses.map(c=> c.progress||0))}%`} />
 				</div>
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
-					<div className="bg-slate-900/40 border border-slate-800 rounded-xl p-3 sm:p-4">
-						<div className="mb-2 font-semibold text-sm sm:text-base">تقدّم أسبوعي</div>
-						<WeeklyProgressChart />
-					</div>
-					<div className="bg-slate-900/40 border border-slate-800 rounded-xl p-3 sm:p-4">
-						<div className="mb-2 font-semibold text-sm sm:text-base">توزيع التقدّم بين الكورسات</div>
-						<CoursesDistribution courses={courses} />
-					</div>
-				</div>
-				<div className="bg-slate-900/40 border border-slate-800 rounded-xl p-3 sm:p-4 mt-4 sm:mt-6">
-					<div className="mb-2 font-semibold text-sm sm:text-base">تقويم الإنجاز (12 أسبوع)</div>
-					<Heatmap />
-				</div>
-			</motion.section>
+			</section>
 
-			<motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="space-y-3 sm:space-y-4">
-				<div className="flex items-center justify-between">
-					<h3 className="text-lg sm:text-xl font-bold">الكورسات والتقدم</h3>
+			{/* Charts */}
+			<section className="grid lg:grid-cols-2 gap-6">
+				<div className="rounded-2xl border border-slate-700 bg-slate-900/40 p-4">
+					<div className="mb-2 font-semibold">تقدّم أسبوعي</div>
+					<WeeklyProgressChart />
 				</div>
+				<div className="rounded-2xl border border-slate-700 bg-slate-900/40 p-4">
+					<div className="mb-2 font-semibold">توزيع التقدّم بين الكورسات</div>
+					<CoursesDistribution courses={courses} />
+				</div>
+			</section>
+
+			<section className="rounded-2xl border border-slate-700 bg-slate-900/40 p-4">
+				<div className="mb-2 font-semibold">تقويم الإنجاز (12 أسبوع)</div>
+				<Heatmap />
+			</section>
+
+			{/* Courses list simple showcase */}
+			<section className="space-y-4">
+				<h3 className="text-xl font-bold">الكورسات والتقدم</h3>
 				{loading ? (
 					<div className="grid gap-3">
 						{Array.from({length:4}).map((_,i)=> (
-							<div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-3 sm:p-4 animate-pulse">
-								<div className="h-4 w-32 sm:w-40 bg-slate-700 rounded mb-3"></div>
+							<div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 animate-pulse">
+								<div className="h-4 w-40 bg-slate-700 rounded mb-3"></div>
 								<div className="w-full h-2 bg-slate-700 rounded">
 									<div className="h-full bg-slate-600 rounded w-1/2"></div>
 								</div>
@@ -114,63 +135,60 @@ export default function PortfolioPage() {
 						))}
 					</div>
 				) : (
-					<div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+					<div className="grid gap-3 md:grid-cols-2">
 						{courses.length === 0 ? (
-							<div className="text-slate-400 text-sm sm:text-base">لا توجد كورسات بعد.</div>
+							<div className="text-slate-400">لا توجد كورسات بعد.</div>
 						) : courses.map(c => (
-							<motion.div key={c.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-slate-800/50 border border-slate-700 rounded-xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+							<motion.div key={c.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 flex items-center gap-4">
 								<svg width="0" height="0"><defs><clipPath id={`clip${c.id}`}><rect width="100%" height="100%" rx="16" /></clipPath></defs></svg>
-								<div className="flex items-center gap-3 sm:gap-4">
+								<div className="flex items-center gap-4">
 									<div>
 										<RadialProgress value={c.progress ?? 0} />
 									</div>
-									<div className="min-w-0 flex-1">
-										<div className="font-semibold text-sm sm:text-base">{c.title}</div>
-										<div className="text-xs sm:text-sm text-slate-400">ليفلات: {c.total_levels ?? 6} — محاضرات منجزة: {c.lectures_done ?? 0} — ليفل: {c.level ?? 1}</div>
+									<div className="min-w-0">
+										<div className="font-semibold">{c.title}</div>
+										<div className="text-sm text-slate-400">ليفلات: {c.total_levels ?? 6} — محاضرات منجزة: {c.lectures_done ?? 0} — ليفل: {c.level ?? 1}</div>
 									</div>
 								</div>
 							</motion.div>
 						))}
 					</div>
 				)}
-			</motion.section>
+			</section>
 
-			<motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="space-y-3 sm:space-y-4">
-				<div className="flex items-center justify-between">
-					<h3 className="text-lg sm:text-xl font-bold">المشاريع</h3>
-				</div>
+			{/* Projects showcase */}
+			<section className="space-y-4">
+				<h3 className="text-xl font-bold">المشاريع</h3>
 				{loading ? (
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 						{Array.from({length:6}).map((_,i)=> (
 							<div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden animate-pulse">
-								<div className="w-full h-32 sm:h-40 bg-slate-700" />
-								<div className="p-3 sm:p-4">
-									<div className="h-4 w-24 sm:w-32 bg-slate-700 rounded mb-2" />
-									<div className="h-3 w-40 sm:w-52 bg-slate-700 rounded" />
+								<div className="w-full h-40 bg-slate-700" />
+								<div className="p-4">
+									<div className="h-4 w-32 bg-slate-700 rounded mb-2" />
+									<div className="h-3 w-52 bg-slate-700 rounded" />
 								</div>
 							</div>
 						))}
 					</div>
 				) : (
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 						{projects.length === 0 ? (
-							<div className="text-slate-400 text-sm sm:text-base">لا توجد مشاريع بعد.</div>
+							<div className="text-slate-400">لا توجد مشاريع بعد.</div>
 						) : projects.map(p => (
 							<motion.div key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
 								{p.image && (
-									<img src={`${API_BASE}${p.image}`} alt={p.title} className="w-full h-32 sm:h-40 object-cover" />
+									<img src={`${API_BASE}${p.image}`} alt={p.title} className="w-full h-40 object-cover" />
 								)}
-								<div className="p-3 sm:p-4">
-									<div className="font-semibold text-base sm:text-lg">{p.title}</div>
-									<div className="text-xs sm:text-sm text-slate-400">ليفل: {p.level ?? '-'}</div>
-									<div className="text-xs sm:text-sm text-slate-400">الكورس: {p.course_id ? (courses.find(c=> c.id === p.course_id)?.title || `#${p.course_id}`) : '—'} {p.course_level ? `(ليفل ${p.course_level})` : ''}</div>
-									<p className="text-xs sm:text-sm text-slate-300 mt-2">{p.description}</p>
+								<div className="p-4">
+									<div className="font-semibold text-lg">{p.title}</div>
+									<p className="text-sm text-slate-300 line-clamp-3">{p.description}</p>
 								</div>
 							</motion.div>
 						))}
 					</div>
 				)}
-			</motion.section>
+			</section>
 		</div>
 	)
 } 
