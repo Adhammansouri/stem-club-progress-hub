@@ -34,12 +34,12 @@ export default function Register() {
 	}
 
 	return (
-		<AuthLayout title="أهلًا وسهلًا!" subtitle={<Typewriter messages={["انضم لعائلة STEM ✨", "كوِّن صداقات وتعلم بمتعة", "ابدأ بناء بورتفوليو مبهر"]} />} cta={<div className="text-sm text-slate-400">لديك حساب؟ <Link to="/login" className="text-brand hover:underline">تسجيل الدخول</Link></div>}>
-			<form onSubmit={onSubmit} className="space-y-4">
-				<input value={name} onChange={e=> setName(e.target.value)} placeholder="الاسم" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-3" required />
-				<input type="email" value={email} onChange={e=> setEmail(e.target.value)} placeholder="البريد الإلكتروني" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-3" required />
-				<input type="password" value={password} onChange={e=> setPassword(e.target.value)} placeholder="كلمة المرور" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-3" required />
-				<button disabled={loading} className="w-full px-4 py-3 rounded-xl bg-brand hover:bg-brand-dark text-lg">{loading ? '...جارٍ الإنشاء' : 'ابدأ الآن'}</button>
+		<AuthLayout title="أهلًا وسهلًا!" subtitle={<Typewriter messages={["انضم لعائلة STEM ✨", "كوِّن صداقات وتعلم بمتعة", "ابدأ بناء بورتفوليو مبهر"]} />} cta={<div className="text-xs sm:text-sm text-slate-400">لديك حساب؟ <Link to="/login" className="text-brand hover:underline">تسجيل الدخول</Link></div>}>
+			<form onSubmit={onSubmit} className="space-y-3 sm:space-y-4">
+				<input value={name} onChange={e=> setName(e.target.value)} placeholder="الاسم" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base" required />
+				<input type="email" value={email} onChange={e=> setEmail(e.target.value)} placeholder="البريد الإلكتروني" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base" required />
+				<input type="password" value={password} onChange={e=> setPassword(e.target.value)} placeholder="كلمة المرور" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base" required />
+				<button disabled={loading} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-brand hover:bg-brand-dark text-base sm:text-lg">{loading ? '...جارٍ الإنشاء' : 'ابدأ الآن'}</button>
 			</form>
 		</AuthLayout>
 	)

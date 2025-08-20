@@ -69,7 +69,7 @@ export default function ProjectsPage() {
 
 	return (
 		<div className="space-y-6">
-			<form onSubmit={addProject} className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 grid md:grid-cols-6 gap-3">
+			<form onSubmit={addProject} className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 grid grid-cols-1 md:grid-cols-6 gap-3">
 				<input required value={form.title} onChange={e=> setForm(s=>({...s, title: e.target.value}))} placeholder="عنوان المشروع" className="rounded-md bg-slate-900 border border-slate-700 px-3 py-2 md:col-span-2" />
 				<input value={form.level} onChange={e=> setForm(s=>({...s, level: e.target.value}))} placeholder="ليفل المشروع" className="rounded-md bg-slate-900 border border-slate-700 px-3 py-2 md:col-span-1" />
 				<select value={form.course_id} onChange={e=> setForm(s=>({...s, course_id: e.target.value}))} className="rounded-md bg-slate-900 border border-slate-700 px-3 py-2 md:col-span-2">
@@ -92,29 +92,29 @@ export default function ProjectsPage() {
 				<DragDropContext onDragEnd={onDragEnd}>
 					<Droppable droppableId="projects">
 						{(provided)=> (
-							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" ref={provided.innerRef} {...provided.droppableProps}>
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4" ref={provided.innerRef} {...provided.droppableProps}>
 								{projects.map((p, index) => (
 									<Draggable key={p.id} draggableId={String(p.id)} index={index}>
 										{(prov)=> (
 											<div ref={prov.innerRef} {...prov.draggableProps} {...prov.dragHandleProps} className="bg-slate-800/60 border border-slate-700 rounded-xl overflow-hidden flex flex-col">
 												{p.image && (
-													<img src={`${API_BASE}${p.image}`} alt={p.title} className="w-full h-40 object-cover" />
+													<img src={`${API_BASE}${p.image}`} alt={p.title} className="w-full h-32 sm:h-40 object-cover" />
 												)}
-												<div className="p-4 flex-1 flex flex-col">
-													<div className="font-semibold text-lg">{p.title}</div>
-													<div className="text-sm text-slate-400">ليفل المشروع: {p.level ?? '-'}</div>
-													<div className="text-sm text-slate-400">الكورس: {p.course_id ? (courses.find(c=> c.id === p.course_id)?.title || `#${p.course_id}`) : '—'} {p.course_level ? `(ليفل ${p.course_level})` : ''}</div>
-													{p.tags && (
-														<div className="mt-2 flex flex-wrap gap-2">{JSON.parse(p.tags).map((t,i)=> <span key={i} className="text-xs px-2 py-0.5 rounded bg-slate-700">#{t}</span>)}</div>
-													)}
-													<p className="text-sm text-slate-300 mt-2 line-clamp-3">{p.description}</p>
-													<div className="mt-auto flex justify-end">
-														<button onClick={()=> removeProject(p.id)} className="px-3 py-1 rounded bg-rose-600 hover:bg-rose-500">حذف</button>
-													</div>
+												<div className="p-3 sm:p-4 flex-1 flex flex-col">
+												<div className="font-semibold text-base sm:text-lg">{p.title}</div>
+												<div className="text-xs sm:text-sm text-slate-400">ليفل المشروع: {p.level ?? '-'}</div>
+												<div className="text-xs sm:text-sm text-slate-400">الكورس: {p.course_id ? (courses.find(c=> c.id === p.course_id)?.title || `#${p.course_id}`) : '—'} {p.course_level ? `(ليفل ${p.course_level})` : ''}</div>
+												{p.tags && (
+													<div className="mt-2 flex flex-wrap gap-2">{JSON.parse(p.tags).map((t,i)=> <span key={i} className="text-xs px-2 py-0.5 rounded bg-slate-700">#{t}</span>)}</div>
+												)}
+												<p className="text-xs sm:text-sm text-slate-300 mt-2 line-clamp-3">{p.description}</p>
+												<div className="mt-auto flex justify-end">
+													<button onClick={()=> removeProject(p.id)} className="px-3 py-1 rounded bg-rose-600 hover:bg-rose-500">حذف</button>
 												</div>
 											</div>
-										)}
-									</Draggable>
+										</div>
+									)}
+								</Draggable>
 								))}
 								{provided.placeholder}
 							</div>
