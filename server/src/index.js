@@ -154,6 +154,18 @@ app.post('/api/auth/seed-demo', (req, res) => {
 	return res.json({ ok: true, email, password, token });
 });
 
+// convenience: allow GET from browser to seed demo user as well
+app.get('/api/auth/seed-demo', (req, res) => {
+	const email = 'demo@stem.club';
+	const password = '12345678';
+	const existing = db.prepare('SELECT * FROM user WHERE email = ?').get(email);
+	if (existing) return res.json({ ok: true, email, password });
+	const hash = bcrypt.hashSync(password, 10);
+	const info = db.prepare('INSERT INTO user (email, password_hash, name) VALUES (?, ?, ?)').run(email, hash, 'Demo User');
+	const token = jwt.sign({ uid: info.lastInsertRowid }, JWT_SECRET, { expiresIn: '7d' });
+	return res.json({ ok: true, email, password, token });
+});
+
 // Migrations
 (function migrateProjectTable() {
 	const columns = db.prepare(`PRAGMA table_info(project)`).all();
