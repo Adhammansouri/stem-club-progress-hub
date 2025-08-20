@@ -108,10 +108,10 @@ export default function CoursesPage() {
 						const isOpen = openIdx === idx
 						return (
 							<motion.div key={idx} layout initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx*0.03 }}
-								className="group relative overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/60 hover:bg-slate-800/80 cursor-pointer"
+								className="group relative overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/60 hover:bg-slate-800/80 cursor-pointer h-36 sm:h-40"
 								onClick={()=> setOpenIdx(isOpen ? null : idx)}>
 								<div className={`absolute -inset-0.5 bg-gradient-to-r ${item.colors} opacity-20 blur-2xl group-hover:opacity-30 transition-opacity`} />
-								<div className="relative p-4 flex items-center gap-4">
+								<div className="relative p-4 h-full flex items-center gap-4">
 									<div className={`w-12 h-12 rounded-xl grid place-items-center text-2xl text-white bg-gradient-to-br ${item.colors} shadow-lg shadow-emerald-500/10`}> <Icon /> </div>
 									<div className="min-w-0 flex-1">
 										<div className="font-semibold">{item.title}</div>
@@ -121,14 +121,16 @@ export default function CoursesPage() {
 								</div>
 								<AnimatePresence initial={false}>
 									{isOpen && (
-										<motion.div key="details" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ type: 'tween', duration: 0.35 }} className="relative px-4 pb-4 text-sm text-slate-300">
-											<p className="leading-relaxed">{item.desc}</p>
-											<div className="grid grid-cols-2 gap-2 mt-3 text-xs">
-												<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• 5 ليفلات</div>
-												<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• 20 سيشن</div>
-												<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• مشاريع صغيرة ممتعة</div>
-												<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• شهادة إنجاز</div>
-											</div>
+										<motion.div key="overlay" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} transition={{ duration: 0.25 }}
+											className="absolute inset-0 bg-slate-900/95 p-4 pr-5 flex flex-col gap-2">
+												<div className="text-sm text-slate-200 font-semibold">{item.title}</div>
+												<p className="text-xs text-slate-300 leading-relaxed flex-1">{item.desc}</p>
+												<div className="grid grid-cols-2 gap-2 text-xs">
+													<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• 5 ليفلات</div>
+													<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• 20 سيشن</div>
+													<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• مشاريع صغيرة ممتعة</div>
+													<div className="rounded-md bg-slate-900/60 border border-slate-700 px-3 py-2">• شهادة إنجاز</div>
+												</div>
 										</motion.div>
 									)}
 								</AnimatePresence>
