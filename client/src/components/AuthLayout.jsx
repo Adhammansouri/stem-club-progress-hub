@@ -32,7 +32,7 @@ export default function AuthLayout({ title, subtitle, children, cta }) {
 				</div>
 				<div ref={cardRef} className="bg-slate-800/60 border border-slate-700 rounded-3xl p-8 shadow-2xl will-change-transform">
 					<div className="flex flex-col items-center mb-6 text-center select-none">
-						<img src="/stem-club.png" className="h-16 mb-3" alt="STEM Club" draggable={false} />
+						<img src={import.meta.env.BASE_URL + 'stem-club.png'} className="h-16 mb-3" alt="STEM Club" draggable={false} />
 						<h2 className="text-3xl font-extrabold">{title}</h2>
 						{subtitle ? <p className="text-slate-300 mt-1">{subtitle}</p> : null}
 					</div>
