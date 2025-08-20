@@ -57,6 +57,7 @@ function App() {
           <Route path="/portfolio" element={<RequireAuth><PortfolioPage /></RequireAuth>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="*" element={<Login />} />
         </Routes>
       </main>
       </div>
