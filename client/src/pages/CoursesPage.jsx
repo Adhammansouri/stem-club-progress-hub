@@ -107,7 +107,7 @@ export default function CoursesPage() {
 						const isEnrolled = enrolledTitles.has(item.title)
 						const isOpen = openIdx === idx
 						return (
-							<motion.div key={idx} layout initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx*0.03 }}
+							<motion.div key={idx} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx*0.03 }}
 								className="group relative overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/60 hover:bg-slate-800/80 cursor-pointer h-36 sm:h-40"
 								onClick={()=> setOpenIdx(isOpen ? null : idx)}>
 								<div className={`absolute -inset-0.5 bg-gradient-to-r ${item.colors} opacity-20 blur-2xl group-hover:opacity-30 transition-opacity`} />
