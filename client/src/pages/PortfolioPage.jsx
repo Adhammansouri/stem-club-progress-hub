@@ -53,21 +53,34 @@ export default function PortfolioPage() {
 		} catch {}
 	}
 
-	async function exportJson() {
+	async function exportPdf() {
 		try {
-			const r = await fetch(`${API_BASE}/api/export`, { headers: { ...authHeader() } })
-			if (!r.ok) throw new Error('تعذر التصدير')
-			const data = await r.json()
-			const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-			const a = document.createElement('a')
-			a.href = URL.createObjectURL(blob)
-			a.download = 'portfolio-export.json'
-			a.click()
-		} catch {}
+			const { default: html2canvas } = await import('html2canvas')
+			const { jsPDF } = await import('jspdf')
+			const target = document.getElementById('portfolio-root') || document.body
+			const canvas = await html2canvas(target, { scale: 2, useCORS: true, backgroundColor: '#0b1220' })
+			const imgData = canvas.toDataURL('image/png')
+			const pdf = new jsPDF('p', 'mm', 'a4')
+			const pageWidth = pdf.internal.pageSize.getWidth()
+			const pageHeight = pdf.internal.pageSize.getHeight()
+			// fit image into page while preserving aspect ratio
+			const imgWidth = pageWidth
+			const imgHeight = (canvas.height * imgWidth) / canvas.width
+			let y = 0
+			pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight, undefined, 'FAST')
+			let remaining = imgHeight
+			while (remaining > pageHeight) {
+				pdf.addPage()
+				y = -(pageHeight * (Math.ceil(remaining / pageHeight) - 1))
+				pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight, undefined, 'FAST')
+				remaining -= pageHeight
+			}
+			pdf.save('portfolio.pdf')
+		} catch (e) {}
 	}
 
 	return (
-		<div className="space-y-8 sm:space-y-10">
+		<div id="portfolio-root" className="space-y-8 sm:space-y-10">
 			{/* Hero */}
 			<section className="relative overflow-hidden rounded-3xl border border-slate-700 bg-gradient-to-br from-slate-800/70 via-slate-800/40 to-slate-900/80 p-6 sm:p-8">
 				<div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 bg-emerald-500/20 blur-3xl rounded-full" />
@@ -91,7 +104,7 @@ export default function PortfolioPage() {
 					</div>
 					<div className="sm:ml-auto flex gap-3">
 						<button onClick={copyLink} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-brand hover:bg-brand-dark"><FaShareAlt /> {copied ? 'تم النسخ' : 'مشاركة'}</button>
-						<button onClick={exportJson} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-slate-700 hover:bg-slate-600"><FaDownload /> تصدير</button>
+						<button onClick={exportPdf} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-slate-700 hover:bg-slate-600"><FaDownload /> تحميل PDF</button>
 					</div>
 				</div>
 				{/* Stats */}
