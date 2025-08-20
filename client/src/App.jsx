@@ -22,12 +22,21 @@ function App() {
     return () => document.removeEventListener('auth:change', onChange)
   }, [])
 
+  // lock scroll when drawer open
+  useEffect(() => {
+    if (menuOpen) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => { document.body.style.overflow = prev }
+    }
+  }, [menuOpen])
+
   function closeMenu(){ setMenuOpen(false) }
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 relative">
       <MouseGlow />
-      <header className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur border-b border-slate-800">
+      <header className="sticky top-0 z-20 bg-slate-900/80 backdrop-blur border-b border-slate-800">
         <div className="max-w-5xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
           <Link to={logged ? "/portfolio" : "/login"} className="flex items-center gap-2" onClick={closeMenu}>
             <img src={import.meta.env.BASE_URL + 'stem-club.png'} alt="STEM Club" className="h-6 sm:h-8 w-auto" />
@@ -61,9 +70,9 @@ function App() {
           {menuOpen && (
             <>
               {/* Backdrop */}
-              <motion.div className="fixed inset-0 bg-black/40 sm:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeMenu} />
+              <motion.div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm sm:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeMenu} />
               {/* Drawer */}
-              <motion.div className="fixed inset-y-0 right-0 w-10/12 max-w-xs bg-slate-900 sm:hidden border-l border-slate-800 shadow-xl flex flex-col" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', stiffness: 260, damping: 24 }}>
+              <motion.div className="fixed inset-y-0 right-0 z-50 w-10/12 max-w-xs bg-slate-900 sm:hidden border-l border-slate-800 shadow-xl flex flex-col" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', stiffness: 260, damping: 24 }}>
                 <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
                   <div className="font-bold">القائمة</div>
                   <button onClick={closeMenu} className="px-2 py-1 rounded-md bg-slate-800">إغلاق</button>
