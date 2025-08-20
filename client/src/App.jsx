@@ -24,31 +24,31 @@ function App() {
     <div className="min-h-screen bg-slate-900 text-slate-100 relative">
       <MouseGlow />
       <header className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur border-b border-slate-800">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
           <Link to={logged ? "/portfolio" : "/login"} className="flex items-center gap-2">
-            <img src={import.meta.env.BASE_URL + 'stem-club.png'} alt="STEM Club" className="h-8 w-auto" />
-            <h1 className="text-xl font-bold">منصة STEM Club</h1>
+            <img src={import.meta.env.BASE_URL + 'stem-club.png'} alt="STEM Club" className="h-6 sm:h-8 w-auto" />
+            <h1 className="text-lg sm:text-xl font-bold">منصة STEM Club</h1>
           </Link>
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-2 sm:gap-4">
             {logged ? (
               <>
-                <NavLink to="/portfolio" className={({isActive}) => `px-3 py-1.5 rounded-md hover:bg-slate-800 ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>عرض عام</NavLink>
-                <NavLink to="/" end className={({isActive}) => `px-3 py-1.5 rounded-md hover:bg-slate-800 ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الملف الشخصي</NavLink>
-                <NavLink to="/courses" className={({isActive}) => `px-3 py-1.5 rounded-md hover:bg-slate-800 ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الكورسات</NavLink>
-                <NavLink to="/projects" className={({isActive}) => `px-3 py-1.5 rounded-md hover:bg-slate-800 ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>المشاريع</NavLink>
+                <NavLink to="/portfolio" className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>عرض عام</NavLink>
+                <NavLink to="/" end className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الملف الشخصي</NavLink>
+                <NavLink to="/courses" className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الكورسات</NavLink>
+                <NavLink to="/projects" className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>المشاريع</NavLink>
                 <LogoutButton />
               </>
             ) : (
               <>
-                <NavLink to="/login" className={({isActive}) => `px-3 py-1.5 rounded-md hover:bg-slate-800 ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>دخول</NavLink>
-                <NavLink to="/register" className={({isActive}) => `px-3 py-1.5 rounded-md hover:bg-slate-800 ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>إنشاء حساب</NavLink>
+                <NavLink to="/login" className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>دخول</NavLink>
+                <NavLink to="/register" className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>إنشاء حساب</NavLink>
               </>
             )}
           </nav>
-      </div>
+        </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-8 relative z-10">
+      <main className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 relative z-10">
         <Routes>
           <Route path="/" element={<RequireAuth><ProfilePage /></RequireAuth>} />
           <Route path="/courses" element={<RequireAuth><CoursesPage /></RequireAuth>} />

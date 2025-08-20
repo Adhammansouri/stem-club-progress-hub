@@ -1,9 +1,9 @@
-export default function Stat({ label, value, helper, className='' }) {
+export default function Stat({ label, value, helper }) {
 	return (
-		<div className={`rounded-xl border border-slate-700 bg-slate-800/50 p-4 ${className}`}>
-			<div className="text-sm text-slate-400">{label}</div>
-			<div className="text-2xl font-extrabold mt-1">{value}</div>
-			{helper ? <div className="text-xs text-slate-400 mt-1">{helper}</div> : null}
+		<div className="bg-slate-900/40 border border-slate-800 rounded-lg p-2 sm:p-3 text-center">
+			<div className="text-lg sm:text-xl font-bold text-brand">{value}</div>
+			<div className="text-xs sm:text-sm text-slate-300">{label}</div>
+			{helper && <div className="text-xs text-slate-400 mt-1">{helper}</div>}
 		</div>
 	)
 } 
