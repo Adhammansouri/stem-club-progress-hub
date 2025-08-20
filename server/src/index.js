@@ -34,6 +34,14 @@ const corsOptions = {
     credentials: true,
 };
 app.use(cors(corsOptions));
+// Fallback: permissive CORS for token-based auth (no cookies)
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') { return res.sendStatus(204); }
+    next();
+});
 // Ensure preflight responses include our CORS headers
 app.options('*', cors(corsOptions));
 app.use(express.json());
