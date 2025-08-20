@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="0;url=./" />
+    <title>Redirecting…</title>
+  </head>
+  <body>
+    <script>
+      // SPA fallback: redirect to index.html preserving path
+      (function() {
+        var redirect = '/' + (location.pathname.split('/').slice(2).join('/') || '');
+        var search = location.search || '';
+        var hash = location.hash || '';
+        window.location.replace('./index.html?redirect=' + encodeURIComponent(redirect + search + hash));
+      })();
+    </script>
+  </body>
+  </html>
+
+

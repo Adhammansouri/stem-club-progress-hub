@@ -45,7 +45,7 @@ function App() {
               </>
             )}
           </nav>
-        </div>
+      </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8 relative z-10">
@@ -59,7 +59,7 @@ function App() {
           <Route path="/register" element={<Register />} />
         </Routes>
       </main>
-    </div>
+      </div>
   )
 }
 
