@@ -38,6 +38,7 @@ jobs:
         run: npm run build
         env:
           GITHUB_PAGES: "true"
+          VITE_API_BASE: ${{ vars.VITE_API_BASE }}
 
       - name: Create SPA fallback (404.html)
         run: cp dist/index.html dist/404.html
