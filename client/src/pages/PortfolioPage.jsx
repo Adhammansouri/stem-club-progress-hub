@@ -55,8 +55,8 @@ export default function PortfolioPage() {
 
 	async function exportPdf() {
 		try {
-			const { default: html2canvas } = await import('html2canvas')
-			const { jsPDF } = await import('jspdf')
+			const html2canvas = (await import('html2canvas')).default
+			const jsPDF = (await import('jspdf')).default
 			const target = document.getElementById('portfolio-root') || document.body
 			const canvas = await html2canvas(target, { scale: 2, useCORS: true, backgroundColor: '#0b1220' })
 			const imgData = canvas.toDataURL('image/png')
