@@ -11,7 +11,7 @@ export default function LogoutButton() {
 		setLoading(true)
 		toast.success('تم تسجيل الخروج')
 		clearToken()
-		setTimeout(()=> { location.href = '/login' }, 600)
+		setTimeout(()=> { location.hash = '#/login' }, 600)
 	}
 
 	return (
