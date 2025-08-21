@@ -15,6 +15,8 @@ import { isLoggedIn } from './lib/auth.js'
 import RequireAuth from './components/RequireAuth.jsx'
 import HomeworkPage from './pages/HomeworkPage.jsx'
 import InstructorDashboard from './pages/InstructorDashboard.jsx'
+import NotFound from './pages/NotFound.jsx'
+import { RequireInstructor } from './components/RequireAuth.jsx'
 
 function App() {
   const [logged, setLogged] = useState(isLoggedIn())
@@ -122,18 +124,22 @@ function App() {
       </AnimatePresence>
 
       <main className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 relative z-10">
-        <Routes>
-          <Route path="/" element={<RequireAuth><ProfilePage /></RequireAuth>} />
-          <Route path="/courses" element={<RequireAuth><CoursesPage /></RequireAuth>} />
-          <Route path="/courses/:id" element={<RequireAuth><CourseDetails /></RequireAuth>} />
-          <Route path="/projects" element={<RequireAuth><ProjectsPage /></RequireAuth>} />
-          <Route path="/homework" element={<RequireAuth><HomeworkPage /></RequireAuth>} />
-          <Route path="/portfolio" element={<RequireAuth><PortfolioPage /></RequireAuth>} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/instructor" element={<RequireAuth><InstructorDashboard /></RequireAuth>} />
-          <Route path="*" element={<Login />} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <motion.div key={location.pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.15 }}>
+            <Routes>
+              <Route path="/" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+              <Route path="/courses" element={<RequireAuth><CoursesPage /></RequireAuth>} />
+              <Route path="/courses/:id" element={<RequireAuth><CourseDetails /></RequireAuth>} />
+              <Route path="/projects" element={<RequireAuth><ProjectsPage /></RequireAuth>} />
+              <Route path="/homework" element={<RequireAuth><HomeworkPage /></RequireAuth>} />
+              <Route path="/instructor" element={<RequireAuth><RequireInstructor><InstructorDashboard /></RequireInstructor></RequireAuth>} />
+              <Route path="/portfolio" element={<RequireAuth><PortfolioPage /></RequireAuth>} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
       </main>
       </div>
   )
