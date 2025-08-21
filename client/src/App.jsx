@@ -1,5 +1,5 @@
 import { NavLink, Route, Routes, Link, useLocation } from 'react-router-dom'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef, useLayoutEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ProfilePage from './pages/ProfilePage.jsx'
 import CoursesPage from './pages/CoursesPage.jsx'
@@ -27,6 +27,9 @@ function App() {
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null }
   })
+  const headerRef = useRef(null)
+  const [headerHeight, setHeaderHeight] = useState(0)
+
   useEffect(() => {
     function onChange(){
       setLogged(isLoggedIn())
@@ -37,6 +40,17 @@ function App() {
     window.addEventListener('scroll', onScroll, { passive: true })
     onScroll()
     return () => { document.removeEventListener('auth:change', onChange); window.removeEventListener('scroll', onScroll) }
+  }, [])
+
+  // Measure header height and keep spacer in sync
+  useLayoutEffect(() => {
+    const el = headerRef.current
+    if (!el) return
+    const update = () => setHeaderHeight(el.offsetHeight)
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [])
 
   // show loader briefly on route changes
@@ -69,7 +83,7 @@ function App() {
           <motion.div className="fixed top-0 inset-x-0 z-40 h-0.5 bg-gradient-to-r from-emerald-400 via-sky-400 to-fuchsia-400" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} exit={{ scaleX: 0 }} transition={{ duration: 0.5 }} style={{ transformOrigin: '0% 50%' }} />
         )}
       </AnimatePresence>
-      <header className={`fixed top-0 inset-x-0 z-30 border-b border-slate-800 ${scrolled ? 'bg-slate-900/80 backdrop-blur-md shadow-lg shadow-black/20' : 'bg-slate-900/60 backdrop-blur'}`}>
+      <header ref={headerRef} className={`fixed top-0 inset-x-0 z-30 border-b border-slate-800 ${scrolled ? 'bg-slate-900/80 backdrop-blur-md shadow-lg shadow-black/20' : 'bg-slate-900/60 backdrop-blur'}`}>
         <div className="max-w-5xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
           <Link to={logged ? "/portfolio" : "/login"} className="flex items-center gap-2" onClick={closeMenu}>
             <img src={import.meta.env.BASE_URL + 'stem-club.png'} alt="STEM Club" className="h-6 sm:h-8 w-auto" />
@@ -104,6 +118,9 @@ function App() {
           <button className="sm:hidden px-3 py-1.5 rounded-md bg-slate-800/70 border border-slate-700 text-sm hover:bg-slate-800" onClick={()=> setMenuOpen(v=> !v)} aria-label="فتح القائمة">القائمة</button>
         </div>
       </header>
+
+      {/* Spacer equal to header height to avoid overlap */}
+      <div style={{ height: headerHeight }} />
 
       {/* Side drawer rendered at root (outside header) to avoid clipping */}
       <AnimatePresence>
@@ -143,7 +160,7 @@ function App() {
         )}
       </AnimatePresence>
 
-      <main className="max-w-5xl mx-auto px-3 sm:px-4 pt-16 py-6 sm:py-8 relative z-10">
+      <main className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 relative z-10">
         <AnimatePresence mode="wait">
           <motion.div key={location.pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.15 }}>
             <Routes>
