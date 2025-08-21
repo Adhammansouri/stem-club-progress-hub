@@ -129,14 +129,15 @@ function auth(req, res, next) {
 
 // Auth endpoints
 app.post('/api/auth/register', (req, res) => {
-	const { email, password, name } = req.body || {};
+	const { email, password, name, role } = req.body || {};
 	if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
 	const normEmail = String(email).trim().toLowerCase();
+	const userRole = String(role || 'student').toLowerCase() === 'instructor' ? 'instructor' : 'student';
 	const hash = bcrypt.hashSync(String(password), 10);
 	try {
-		const info = db.prepare('INSERT INTO user (email, password_hash, name) VALUES (?, ?, ?)').run(normEmail, hash, name || null);
+		const info = db.prepare('INSERT INTO user (email, password_hash, name, role) VALUES (?, ?, ?, ?)').run(normEmail, hash, name || null, userRole);
 		const token = jwt.sign({ uid: info.lastInsertRowid }, JWT_SECRET, { expiresIn: '7d' });
-		res.json({ token, user: { id: info.lastInsertRowid, email: normEmail, name } });
+		res.json({ token, user: { id: info.lastInsertRowid, email: normEmail, name, role: userRole } });
 	} catch (e) {
 		return res.status(400).json({ error: 'Email already registered' });
 	}
@@ -149,7 +150,7 @@ app.post('/api/auth/login', (req, res) => {
 	if (!u) return res.status(401).json({ error: 'Invalid credentials' });
 	if (!bcrypt.compareSync(String(password || ''), u.password_hash)) return res.status(401).json({ error: 'Invalid credentials' });
 	const token = jwt.sign({ uid: u.id }, JWT_SECRET, { expiresIn: '7d' });
-	res.json({ token, user: { id: u.id, email: u.email, name: u.name } });
+	res.json({ token, user: { id: u.id, email: u.email, name: u.name, role: u.role || 'student' } });
 });
 
 app.post('/api/auth/seed-demo', (req, res) => {

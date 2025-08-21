@@ -26,7 +26,7 @@ export default function Login() {
 			})
 			if (!res.ok) throw new Error('بيانات الدخول غير صحيحة')
 			const data = await res.json()
-			setToken(data.token, data.user)
+			setToken(data.token, data.user) // auth change event will refresh role-aware UI
 			playPop(); confettiBurst()
 			toast.success('مرحبًا بعودتك!')
 			navigate(from)
