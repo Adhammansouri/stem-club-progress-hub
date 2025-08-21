@@ -22,6 +22,7 @@ function App() {
   const [logged, setLogged] = useState(isLoggedIn())
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null }
@@ -32,7 +33,10 @@ function App() {
       try { setUser(JSON.parse(localStorage.getItem('user') || 'null')) } catch { setUser(null) }
     }
     document.addEventListener('auth:change', onChange)
-    return () => document.removeEventListener('auth:change', onChange)
+    const onScroll = () => setScrolled(window.scrollY > 4)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => { document.removeEventListener('auth:change', onChange); window.removeEventListener('scroll', onScroll) }
   }, [])
 
   // show loader briefly on route changes
@@ -53,45 +57,51 @@ function App() {
 
   function closeMenu(){ setMenuOpen(false) }
 
+  const linkBase = (isActive) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-sm sm:text-base transition-colors ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200 hover:text-white hover:bg-slate-800/70'}`
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 relative">
       <MouseGlow />
       <LogoLoader show={loading} />
-      <header className="fixed top-0 inset-x-0 z-30 bg-slate-900/80 backdrop-blur border-b border-slate-800">
+      {/* Top progress bar */}
+      <AnimatePresence>
+        {loading && (
+          <motion.div className="fixed top-0 inset-x-0 z-40 h-0.5 bg-gradient-to-r from-emerald-400 via-sky-400 to-fuchsia-400" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} exit={{ scaleX: 0 }} transition={{ duration: 0.5 }} style={{ transformOrigin: '0% 50%' }} />
+        )}
+      </AnimatePresence>
+      <header className={`fixed top-0 inset-x-0 z-30 border-b border-slate-800 ${scrolled ? 'bg-slate-900/80 backdrop-blur-md shadow-lg shadow-black/20' : 'bg-slate-900/60 backdrop-blur'}`}>
         <div className="max-w-5xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
           <Link to={logged ? "/portfolio" : "/login"} className="flex items-center gap-2" onClick={closeMenu}>
             <img src={import.meta.env.BASE_URL + 'stem-club.png'} alt="STEM Club" className="h-6 sm:h-8 w-auto" />
             <h1 className="text-lg sm:text-xl font-bold">منصة STEM Club</h1>
           </Link>
           {/* Desktop nav */}
-          <nav className="hidden sm:flex items-center gap-2 sm:gap-4">
+          <nav className="hidden sm:flex items-center gap-2 sm:gap-3">
             {logged ? (
               <>
                 {user?.role === 'instructor' ? (
-                  <NavLink to="/instructor" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>المدرّس</NavLink>
+                  <NavLink to="/instructor" onClick={closeMenu} className={({isActive}) => linkBase(isActive)}>المدرّس</NavLink>
                 ) : (
                   <>
-                    <NavLink to="/portfolio" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>عرض عام</NavLink>
-                    <NavLink to="/" end onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الملف الشخصي</NavLink>
-                    <NavLink to="/courses" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الكورسات</NavLink>
-                    <NavLink to="/projects" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>المشاريع</NavLink>
-                    <NavLink to="/homework" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الواجبات</NavLink>
+                    <NavLink to="/portfolio" onClick={closeMenu} className={({isActive}) => linkBase(isActive)}>عرض عام</NavLink>
+                    <NavLink to="/" end onClick={closeMenu} className={({isActive}) => linkBase(isActive)}>الملف الشخصي</NavLink>
+                    <NavLink to="/courses" onClick={closeMenu} className={({isActive}) => linkBase(isActive)}>الكورسات</NavLink>
+                    <NavLink to="/projects" onClick={closeMenu} className={({isActive}) => linkBase(isActive)}>المشاريع</NavLink>
+                    <NavLink to="/homework" onClick={closeMenu} className={({isActive}) => linkBase(isActive)}>الواجبات</NavLink>
                   </>
                 )}
                 <LogoutButton />
               </>
             ) : (
               <>
-                <NavLink to="/login" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>دخول</NavLink>
-                <NavLink to="/register" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>إنشاء حساب</NavLink>
+                <NavLink to="/login" onClick={closeMenu} className={({isActive}) => linkBase(isActive)}>دخول</NavLink>
+                <NavLink to="/register" onClick={closeMenu} className={({isActive}) => linkBase(isActive)}>إنشاء حساب</NavLink>
               </>
             )}
           </nav>
 
           {/* Mobile hamburger */}
-          <button className="sm:hidden px-3 py-1.5 rounded-md bg-slate-800/70 border border-slate-700 text-sm" onClick={()=> setMenuOpen(v=> !v)} aria-label="فتح القائمة">
-            القائمة
-          </button>
+          <button className="sm:hidden px-3 py-1.5 rounded-md bg-slate-800/70 border border-slate-700 text-sm hover:bg-slate-800" onClick={()=> setMenuOpen(v=> !v)} aria-label="فتح القائمة">القائمة</button>
         </div>
       </header>
 
@@ -151,7 +161,7 @@ function App() {
           </motion.div>
         </AnimatePresence>
       </main>
-      </div>
+    </div>
   )
 }
 
