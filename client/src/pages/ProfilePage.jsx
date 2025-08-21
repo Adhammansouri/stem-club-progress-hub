@@ -14,7 +14,8 @@ export default function ProfilePage() {
 		github: '',
 		facebook: '',
 		linkedin: '',
-		avatar: ''
+		avatar: '',
+		group_code: ''
 	})
 	const [avatarFile, setAvatarFile] = useState(null)
 	const [saving, setSaving] = useState(false)
@@ -33,7 +34,7 @@ export default function ProfilePage() {
 		setSaving(true)
 		try {
 			const form = new FormData()
-			for (const key of ['name','age','bio','github','facebook','linkedin']) {
+			for (const key of ['name','age','bio','github','facebook','linkedin','group_code']) {
 				if (student[key] !== undefined && student[key] !== null) form.append(key, student[key])
 			}
 			if (avatarFile) form.append('avatar', avatarFile)
@@ -67,6 +68,9 @@ export default function ProfilePage() {
 							<input type="file" className="hidden" onChange={(e)=> setAvatarFile(e.target.files?.[0] || null)} accept="image/*" />
 							<span className="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600 inline-flex items-center gap-2"><FaUpload /> تحديث الصورة</span>
 						</label>
+						{student.group_code && (
+							<div className="mt-2 text-sm text-slate-300">كود المجموعة: <span className="font-semibold">{student.group_code}</span></div>
+						)}
 					</div>
 				</div>
 			</div>
@@ -107,6 +111,12 @@ export default function ProfilePage() {
 								<input value={student.linkedin || ''} onChange={e=> setStudent(s=>({...s, linkedin: e.target.value}))} className="w-full rounded-md bg-slate-900 border border-slate-700 pl-3 pr-3 py-2" placeholder="رابط لينكدإن" />
 							</div>
 						</div>
+					</div>
+
+					<div>
+						<label className="block mb-1 text-sm text-slate-300">كود المجموعة</label>
+						<input value={student.group_code || ''} onChange={e=> setStudent(s=>({...s, group_code: e.target.value}))} className="w-full rounded-md bg-slate-900 border border-slate-700 px-3 py-2" placeholder="مثال: G3-WEB-Thu-6pm" />
+						<p className="text-xs text-slate-400 mt-1">هذا الكود يحدد المواعيد والمدرب. احصل عليه من الإدارة.</p>
 					</div>
 
 					<div className="flex justify-end">

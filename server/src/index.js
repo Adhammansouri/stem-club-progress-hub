@@ -87,6 +87,8 @@ CREATE TABLE IF NOT EXISTS project (
 		)`);
 	} catch {}
 	try { db.exec(`ALTER TABLE profile ADD COLUMN mascot TEXT`); } catch {}
+	// add group code for class allocation
+	try { db.exec(`ALTER TABLE profile ADD COLUMN group_code TEXT`); } catch {}
 	// Achievements table
 	try {
 		db.exec(`CREATE TABLE IF NOT EXISTS achievement (
@@ -281,22 +283,22 @@ app.get('/api/student', auth, (req, res) => {
 });
 
 app.post('/api/student', auth, upload.single('avatar'), (req, res) => {
-	const { name, age, bio, github, facebook, linkedin, mascot } = req.body;
+	const { name, age, bio, github, facebook, linkedin, mascot, group_code } = req.body;
 	let avatarPath = null;
 	if (req.file) {
 		avatarPath = `/uploads/${req.file.filename}`;
 	}
 	const exists = db.prepare('SELECT user_id, avatar FROM profile WHERE user_id = ?').get(Number(req.userId));
 	if (exists) {
-		const stmt = db.prepare(`UPDATE profile SET name=?, age=?, bio=?, github=?, facebook=?, linkedin=?, mascot=COALESCE(?, mascot), avatar=COALESCE(?, avatar) WHERE user_id = ?`);
-		stmt.run(name || null, age ? Number(age) : null, bio || null, github || null, facebook || null, linkedin || null, mascot || null, avatarPath, Number(req.userId));
+		const stmt = db.prepare(`UPDATE profile SET name=?, age=?, bio=?, github=?, facebook=?, linkedin=?, mascot=COALESCE(?, mascot), group_code=COALESCE(?, group_code), avatar=COALESCE(?, avatar) WHERE user_id = ?`);
+		stmt.run(name || null, age ? Number(age) : null, bio || null, github || null, facebook || null, linkedin || null, mascot || null, group_code || null, avatarPath, Number(req.userId));
 		if (avatarPath && exists.avatar && exists.avatar !== avatarPath) {
 			const abs = path.join(UPLOAD_DIR, path.basename(exists.avatar));
 			if (fs.existsSync(abs)) { try { fs.unlinkSync(abs); } catch {} }
 		}
 	} else {
-		const stmt = db.prepare(`INSERT INTO profile (user_id, name, age, bio, github, facebook, linkedin, avatar, mascot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-		stmt.run(Number(req.userId), name || null, age ? Number(age) : null, bio || null, github || null, facebook || null, linkedin || null, avatarPath, mascot || null);
+		const stmt = db.prepare(`INSERT INTO profile (user_id, name, age, bio, github, facebook, linkedin, avatar, mascot, group_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+		stmt.run(Number(req.userId), name || null, age ? Number(age) : null, bio || null, github || null, facebook || null, linkedin || null, avatarPath, mascot || null, group_code || null);
 	}
 	const row = db.prepare('SELECT * FROM profile WHERE user_id = ?').get(Number(req.userId));
 	res.json(row);
