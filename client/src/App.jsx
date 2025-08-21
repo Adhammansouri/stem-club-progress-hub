@@ -21,11 +21,14 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const location = useLocation()
-  const user = useMemo(() => {
+  const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null }
-  }, [])
+  })
   useEffect(() => {
-    function onChange(){ setLogged(isLoggedIn()) }
+    function onChange(){
+      setLogged(isLoggedIn())
+      try { setUser(JSON.parse(localStorage.getItem('user') || 'null')) } catch { setUser(null) }
+    }
     document.addEventListener('auth:change', onChange)
     return () => document.removeEventListener('auth:change', onChange)
   }, [])
