@@ -57,7 +57,7 @@ function App() {
     <div className="min-h-screen bg-slate-900 text-slate-100 relative">
       <MouseGlow />
       <LogoLoader show={loading} />
-      <header className="sticky top-0 z-20 bg-slate-900/80 backdrop-blur border-b border-slate-800">
+      <header className="fixed top-0 inset-x-0 z-30 bg-slate-900/80 backdrop-blur border-b border-slate-800">
         <div className="max-w-5xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
           <Link to={logged ? "/portfolio" : "/login"} className="flex items-center gap-2" onClick={closeMenu}>
             <img src={import.meta.env.BASE_URL + 'stem-club.png'} alt="STEM Club" className="h-6 sm:h-8 w-auto" />
@@ -67,13 +67,16 @@ function App() {
           <nav className="hidden sm:flex items-center gap-2 sm:gap-4">
             {logged ? (
               <>
-                <NavLink to="/portfolio" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>عرض عام</NavLink>
-                <NavLink to="/" end onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الملف الشخصي</NavLink>
-                <NavLink to="/courses" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الكورسات</NavLink>
-                <NavLink to="/projects" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>المشاريع</NavLink>
-                <NavLink to="/homework" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الواجبات</NavLink>
-                {user?.role === 'instructor' && (
+                {user?.role === 'instructor' ? (
                   <NavLink to="/instructor" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>المدرّس</NavLink>
+                ) : (
+                  <>
+                    <NavLink to="/portfolio" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>عرض عام</NavLink>
+                    <NavLink to="/" end onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الملف الشخصي</NavLink>
+                    <NavLink to="/courses" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الكورسات</NavLink>
+                    <NavLink to="/projects" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>المشاريع</NavLink>
+                    <NavLink to="/homework" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الواجبات</NavLink>
+                  </>
                 )}
                 <LogoutButton />
               </>
@@ -105,10 +108,17 @@ function App() {
               <div className="p-2 flex-1 overflow-y-auto">
                 {logged ? (
                   <div className="flex flex-col gap-1">
-                    <NavLink to="/portfolio" onClick={closeMenu} className={({isActive}) => `block px-3 py-2 rounded-md ${isActive ? 'bg-slate-800 text-brand' : 'hover:bg-slate-800 text-slate-200'}`}>عرض عام</NavLink>
-                    <NavLink to="/" end onClick={closeMenu} className={({isActive}) => `block px-3 py-2 rounded-md ${isActive ? 'bg-slate-800 text-brand' : 'hover:bg-slate-800 text-slate-200'}`}>الملف الشخصي</NavLink>
-                    <NavLink to="/courses" onClick={closeMenu} className={({isActive}) => `block px-3 py-2 rounded-md ${isActive ? 'bg-slate-800 text-brand' : 'hover:bg-slate-800 text-slate-200'}`}>الكورسات</NavLink>
-                    <NavLink to="/projects" onClick={closeMenu} className={({isActive}) => `block px-3 py-2 rounded-md ${isActive ? 'bg-slate-800 text-brand' : 'hover:bg-slate-800 text-slate-200'}`}>المشاريع</NavLink>
+                    {user?.role === 'instructor' ? (
+                      <NavLink to="/instructor" onClick={closeMenu} className={({isActive}) => `block px-3 py-2 rounded-md ${isActive ? 'bg-slate-800 text-brand' : 'hover:bg-slate-800 text-slate-200'}`}>المدرّس</NavLink>
+                    ) : (
+                      <>
+                        <NavLink to="/portfolio" onClick={closeMenu} className={({isActive}) => `block px-3 py-2 rounded-md ${isActive ? 'bg-slate-800 text-brand' : 'hover:bg-slate-800 text-slate-200'}`}>عرض عام</NavLink>
+                        <NavLink to="/" end onClick={closeMenu} className={({isActive}) => `block px-3 py-2 rounded-md ${isActive ? 'bg-slate-800 text-brand' : 'hover:bg-slate-800 text-slate-200'}`}>الملف الشخصي</NavLink>
+                        <NavLink to="/courses" onClick={closeMenu} className={({isActive}) => `block px-3 py-2 rounded-md ${isActive ? 'bg-slate-800 text-brand' : 'hover:bg-slate-800 text-slate-200'}`}>الكورسات</NavLink>
+                        <NavLink to="/projects" onClick={closeMenu} className={({isActive}) => `block px-3 py-2 rounded-md ${isActive ? 'bg-slate-800 text-brand' : 'hover:bg-slate-800 text-slate-200'}`}>المشاريع</NavLink>
+                        <NavLink to="/homework" onClick={closeMenu} className={({isActive}) => `block px-3 py-2 rounded-md ${isActive ? 'bg-slate-800 text-brand' : 'hover:bg-slate-800 text-slate-200'}`}>الواجبات</NavLink>
+                      </>
+                    )}
                     <div className="px-3 py-2"><LogoutButton /></div>
                   </div>
                 ) : (
@@ -123,7 +133,7 @@ function App() {
         )}
       </AnimatePresence>
 
-      <main className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 relative z-10">
+      <main className="max-w-5xl mx-auto px-3 sm:px-4 pt-16 py-6 sm:py-8 relative z-10">
         <AnimatePresence mode="wait">
           <motion.div key={location.pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.15 }}>
             <Routes>
