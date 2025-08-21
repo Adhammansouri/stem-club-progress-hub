@@ -13,6 +13,7 @@ import LogoutButton from './components/LogoutButton.jsx'
 import LogoLoader from './components/LogoLoader.jsx'
 import { isLoggedIn } from './lib/auth.js'
 import RequireAuth from './components/RequireAuth.jsx'
+import HomeworkPage from './pages/HomeworkPage.jsx'
 
 function App() {
   const [logged, setLogged] = useState(isLoggedIn())
@@ -61,6 +62,7 @@ function App() {
                 <NavLink to="/" end onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الملف الشخصي</NavLink>
                 <NavLink to="/courses" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الكورسات</NavLink>
                 <NavLink to="/projects" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>المشاريع</NavLink>
+                <NavLink to="/homework" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الواجبات</NavLink>
                 <LogoutButton />
               </>
             ) : (
@@ -115,6 +117,7 @@ function App() {
           <Route path="/courses" element={<RequireAuth><CoursesPage /></RequireAuth>} />
           <Route path="/courses/:id" element={<RequireAuth><CourseDetails /></RequireAuth>} />
           <Route path="/projects" element={<RequireAuth><ProjectsPage /></RequireAuth>} />
+          <Route path="/homework" element={<RequireAuth><HomeworkPage /></RequireAuth>} />
           <Route path="/portfolio" element={<RequireAuth><PortfolioPage /></RequireAuth>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

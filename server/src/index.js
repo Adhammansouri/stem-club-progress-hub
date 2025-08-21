@@ -521,6 +521,20 @@ app.delete('/api/courses/:id/submissions/:sid', auth, (req, res) => {
   res.json({ success: true })
 })
 
+// aggregated submissions for current user
+app.get('/api/submissions', auth, (req, res) => {
+  try {
+    const rows = db.prepare(`
+      SELECT s.id, s.course_id, s.session_index, s.file_path, s.note, s.created_at,
+             c.title as course_title
+      FROM submission s LEFT JOIN course c ON c.id = s.course_id
+      WHERE s.user_id = ?
+      ORDER BY s.created_at DESC, s.id DESC
+    `).all(Number(req.userId))
+    res.json(rows)
+  } catch { res.json([]) }
+})
+
 app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
 }); 
