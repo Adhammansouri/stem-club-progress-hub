@@ -609,6 +609,21 @@ app.get('/api/instructor/submissions', auth, requireInstructor, (req, res) => {
 	} catch { res.json([]) }
 })
 
+app.get('/api/instructor/groups/:code/details', auth, requireInstructor, (req, res) => {
+  try {
+    const code = String(req.params.code || '').trim()
+    const owned = db.prepare('SELECT 1 FROM instructor_group WHERE instructor_id = ? AND code = ?').get(Number(req.userId), code)
+    if (!owned) return res.status(403).json({ error: 'Forbidden' })
+    const students = db.prepare('SELECT user_id, name, github, facebook, linkedin FROM profile WHERE group_code = ?').all(code)
+    const items = students.map(st => {
+      const count = db.prepare('SELECT COUNT(*) as c FROM submission WHERE user_id = ?').get(st.user_id)?.c || 0
+      const latest = db.prepare('SELECT created_at FROM submission WHERE user_id = ? ORDER BY created_at DESC, id DESC LIMIT 1').get(st.user_id)?.created_at || null
+      return { user_id: st.user_id, name: st.name, github: st.github, facebook: st.facebook, linkedin: st.linkedin, submissions: count, latest }
+    })
+    res.json({ code, students: items })
+  } catch { res.status(500).json({ error: 'failed' }) }
+})
+
 app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
 }); 

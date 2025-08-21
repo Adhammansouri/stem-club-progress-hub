@@ -11,6 +11,7 @@ export default function InstructorDashboard() {
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState('')
   const [preview, setPreview] = useState(null)
+  const [groupDetails, setGroupDetails] = useState(null)
 
   async function load() {
     setLoading(true)
@@ -46,6 +47,15 @@ export default function InstructorDashboard() {
     } catch { toast.error('تعذر الحذف') }
   }
 
+  async function openDetails(code){
+    try {
+      const r = await fetch(`${API_BASE}/api/instructor/groups/${encodeURIComponent(code)}/details`, { headers: { ...authHeader() } })
+      if (!r.ok) throw new Error()
+      const data = await r.json()
+      setGroupDetails(data)
+    } catch { toast.error('تعذر جلب تفاصيل المجموعة') }
+  }
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return feed
@@ -73,7 +83,10 @@ export default function InstructorDashboard() {
                   <div className="font-semibold">{g.code}</div>
                   <div className="text-slate-400">طلاب: {g.student_count} • واجبات: {g.submission_count}</div>
                 </div>
-                <button onClick={()=> removeGroup(g.id)} className="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500">حذف</button>
+                <div className="flex items-center gap-2">
+                  <button onClick={()=> openDetails(g.code)} className="px-2 py-1 rounded bg-slate-700 hover:bg-slate-600">تفاصيل</button>
+                  <button onClick={()=> removeGroup(g.id)} className="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500">حذف</button>
+                </div>
               </li>
             ))}
           </ul>
@@ -113,6 +126,29 @@ export default function InstructorDashboard() {
                 ) : (
                   <a href={`${API_BASE}${preview.file_path}`} target="_blank" rel="noreferrer" className="text-brand hover:underline">فتح الملف</a>
                 )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {groupDetails && (
+          <motion.div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={()=> setGroupDetails(null)}>
+            <motion.div className="absolute top-0 right-0 h-full w-full max-w-xl bg-slate-900 border-l border-slate-700" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} onClick={e=> e.stopPropagation()}>
+              <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                <div className="font-semibold text-slate-200">تفاصيل المجموعة: {groupDetails.code}</div>
+                <button onClick={()=> setGroupDetails(null)} className="px-2 py-1 rounded-md bg-slate-800">إغلاق</button>
+              </div>
+              <div className="p-4 space-y-2 overflow-auto h-full">
+                {(groupDetails.students || []).length === 0 ? (
+                  <div className="text-slate-400">لا يوجد طلاب مسجلين بهذا الكود.</div>
+                ) : groupDetails.students.map(st => (
+                  <div key={st.user_id} className="bg-slate-900/60 border border-slate-700 rounded-lg p-3">
+                    <div className="font-semibold">{st.name || `#${st.user_id}`}</div>
+                    <div className="text-xs text-slate-400">واجبات: {st.submissions} • آخر تسليم: {st.latest ? new Date(st.latest).toLocaleString() : '—'}</div>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </motion.div>
