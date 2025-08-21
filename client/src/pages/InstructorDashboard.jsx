@@ -144,9 +144,21 @@ export default function InstructorDashboard() {
                 {(groupDetails.students || []).length === 0 ? (
                   <div className="text-slate-400">لا يوجد طلاب مسجلين بهذا الكود.</div>
                 ) : groupDetails.students.map(st => (
-                  <div key={st.user_id} className="bg-slate-900/60 border border-slate-700 rounded-lg p-3">
-                    <div className="font-semibold">{st.name || `#${st.user_id}`}</div>
-                    <div className="text-xs text-slate-400">واجبات: {st.submissions} • آخر تسليم: {st.latest ? new Date(st.latest).toLocaleString() : '—'}</div>
+                  <div key={st.user_id} className="bg-slate-900/60 border border-slate-700 rounded-lg p-3 flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full overflow-hidden ring-1 ring-slate-700">
+                      {st.avatar ? <img src={`${API_BASE}${st.avatar}`} alt={st.name} className="w-full h-full object-cover" /> : <div className="w-full h-full grid place-items-center bg-slate-800 text-slate-400 text-xs">بدون</div>}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold truncate">{st.name || `#${st.user_id}`}</div>
+                      <div className="text-xs text-slate-400 truncate">{st.email || '—'}</div>
+                      <div className="text-xs text-slate-400">كورسات: {st.courses_count} • متوسط التقدم: {st.avg_progress}% • واجبات: {st.submissions}</div>
+                      <div className="flex items-center gap-2 text-xs mt-1">
+                        {st.github && <a className="text-brand hover:underline" href={st.github} target="_blank" rel="noreferrer">GitHub</a>}
+                        {st.facebook && <a className="text-brand hover:underline" href={st.facebook} target="_blank" rel="noreferrer">Facebook</a>}
+                        {st.linkedin && <a className="text-brand hover:underline" href={st.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>}
+                      </div>
+                    </div>
+                    <div className="text-xs text-slate-400">آخر: {st.latest ? new Date(st.latest).toLocaleString() : '—'}</div>
                   </div>
                 ))}
               </div>

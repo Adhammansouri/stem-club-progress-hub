@@ -615,11 +615,29 @@ app.get('/api/instructor/groups/:code/details', auth, requireInstructor, (req, r
     const code = String(req.params.code || '').trim()
     const owned = db.prepare('SELECT 1 FROM instructor_group WHERE instructor_id = ? AND code = ?').get(Number(req.userId), code)
     if (!owned) return res.status(403).json({ error: 'Forbidden' })
-    const students = db.prepare('SELECT user_id, name, github, facebook, linkedin FROM profile WHERE group_code = ?').all(code)
+    const students = db.prepare(`
+      SELECT p.user_id, p.name, p.github, p.facebook, p.linkedin, p.avatar,
+             u.email
+      FROM profile p LEFT JOIN user u ON u.id = p.user_id
+      WHERE p.group_code = ?
+    `).all(code)
     const items = students.map(st => {
       const count = db.prepare('SELECT COUNT(*) as c FROM submission WHERE user_id = ?').get(st.user_id)?.c || 0
       const latest = db.prepare('SELECT created_at FROM submission WHERE user_id = ? ORDER BY created_at DESC, id DESC LIMIT 1').get(st.user_id)?.created_at || null
-      return { user_id: st.user_id, name: st.name, github: st.github, facebook: st.facebook, linkedin: st.linkedin, submissions: count, latest }
+      const cinfo = db.prepare('SELECT COUNT(*) as cc, AVG(progress) as ap FROM course WHERE user_id = ?').get(st.user_id) || { cc: 0, ap: null }
+      return {
+        user_id: st.user_id,
+        name: st.name,
+        email: st.email,
+        github: st.github,
+        facebook: st.facebook,
+        linkedin: st.linkedin,
+        avatar: st.avatar,
+        submissions: count,
+        latest,
+        courses_count: cinfo.cc || 0,
+        avg_progress: cinfo.ap != null ? Math.round(cinfo.ap) : 0,
+      }
     })
     res.json({ code, students: items })
   } catch { res.status(500).json({ error: 'failed' }) }
