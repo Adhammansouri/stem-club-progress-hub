@@ -7,4 +7,13 @@ export default function RequireAuth({ children }) {
 		return <Navigate to="/login" state={{ from: location }} replace />
 	}
 	return children
+}
+
+export function RequireInstructor({ children }) {
+	const location = useLocation()
+	// role is stored in user object if needed later; for now rely on server-side endpoints
+	if (!isLoggedIn()) {
+		return <Navigate to="/login" state={{ from: location }} replace />
+	}
+	return children
 } 

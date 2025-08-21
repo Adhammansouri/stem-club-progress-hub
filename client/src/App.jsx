@@ -1,5 +1,5 @@
 import { NavLink, Route, Routes, Link, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ProfilePage from './pages/ProfilePage.jsx'
 import CoursesPage from './pages/CoursesPage.jsx'
@@ -14,12 +14,16 @@ import LogoLoader from './components/LogoLoader.jsx'
 import { isLoggedIn } from './lib/auth.js'
 import RequireAuth from './components/RequireAuth.jsx'
 import HomeworkPage from './pages/HomeworkPage.jsx'
+import InstructorDashboard from './pages/InstructorDashboard.jsx'
 
 function App() {
   const [logged, setLogged] = useState(isLoggedIn())
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const location = useLocation()
+  const user = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null }
+  }, [])
   useEffect(() => {
     function onChange(){ setLogged(isLoggedIn()) }
     document.addEventListener('auth:change', onChange)
@@ -63,6 +67,9 @@ function App() {
                 <NavLink to="/courses" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الكورسات</NavLink>
                 <NavLink to="/projects" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>المشاريع</NavLink>
                 <NavLink to="/homework" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>الواجبات</NavLink>
+                {user?.role === 'instructor' && (
+                  <NavLink to="/instructor" onClick={closeMenu} className={({isActive}) => `px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-slate-800 text-sm sm:text-base ${isActive ? 'bg-slate-800 text-brand' : 'text-slate-200'}`}>المدرّس</NavLink>
+                )}
                 <LogoutButton />
               </>
             ) : (
@@ -121,6 +128,7 @@ function App() {
           <Route path="/portfolio" element={<RequireAuth><PortfolioPage /></RequireAuth>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/instructor" element={<RequireAuth><InstructorDashboard /></RequireAuth>} />
           <Route path="*" element={<Login />} />
         </Routes>
       </main>

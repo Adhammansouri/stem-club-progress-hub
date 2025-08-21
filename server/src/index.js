@@ -537,6 +537,78 @@ app.get('/api/submissions', auth, (req, res) => {
   } catch { res.json([]) }
 })
 
+// ensure user has role column
+try { db.exec(`ALTER TABLE user ADD COLUMN role TEXT DEFAULT 'student'`); } catch {}
+
+function requireInstructor(req, res, next) {
+	try {
+		const row = db.prepare('SELECT role FROM user WHERE id = ?').get(Number(req.userId))
+		if (!row || row.role !== 'instructor') return res.status(403).json({ error: 'Forbidden' })
+		return next()
+	} catch { return res.status(403).json({ error: 'Forbidden' }) }
+}
+
+// map instructor to groups they own
+(function migrateInstructorGroups(){
+	try {
+		db.exec(`CREATE TABLE IF NOT EXISTS instructor_group (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			instructor_id INTEGER NOT NULL,
+			code TEXT NOT NULL,
+			UNIQUE(instructor_id, code)
+		)`)
+	} catch {}
+})()
+
+// instructor: add/list/remove groups
+app.get('/api/instructor/groups', auth, requireInstructor, (req, res) => {
+	try {
+		const groups = db.prepare('SELECT id, code FROM instructor_group WHERE instructor_id = ? ORDER BY code ASC').all(Number(req.userId))
+		// enrich with student/submission counts
+		const items = groups.map(g => {
+			const students = db.prepare('SELECT COUNT(*) as c FROM profile WHERE group_code = ?').get(g.code)?.c || 0
+			const subs = db.prepare(`SELECT COUNT(*) as c FROM submission s JOIN profile p ON p.user_id = s.user_id WHERE p.group_code = ?`).get(g.code)?.c || 0
+			return { id: g.id, code: g.code, student_count: students, submission_count: subs }
+		})
+		res.json(items)
+	} catch { res.json([]) }
+})
+
+app.post('/api/instructor/groups', auth, requireInstructor, (req, res) => {
+	const { code } = req.body || {}
+	if (!code || !String(code).trim()) return res.status(400).json({ error: 'code required' })
+	try {
+		db.prepare('INSERT OR IGNORE INTO instructor_group (instructor_id, code) VALUES (?, ?)').run(Number(req.userId), String(code).trim())
+		res.json({ ok: true })
+	} catch { res.status(400).json({ error: 'failed' }) }
+})
+
+app.delete('/api/instructor/groups/:gid', auth, requireInstructor, (req, res) => {
+	try {
+		db.prepare('DELETE FROM instructor_group WHERE id = ? AND instructor_id = ?').run(Number(req.params.gid), Number(req.userId))
+		res.json({ ok: true })
+	} catch { res.status(400).json({ error: 'failed' }) }
+})
+
+// instructor: submissions feed for owned groups
+app.get('/api/instructor/submissions', auth, requireInstructor, (req, res) => {
+	try {
+		const codes = db.prepare('SELECT code FROM instructor_group WHERE instructor_id = ?').all(Number(req.userId)).map(x=> x.code)
+		if (!codes.length) return res.json([])
+		const placeholders = codes.map(()=> '?').join(',')
+		const rows = db.prepare(`
+			SELECT s.id, s.user_id, s.course_id, s.session_index, s.file_path, s.note, s.created_at,
+			       c.title as course_title, p.group_code
+			FROM submission s
+			JOIN profile p ON p.user_id = s.user_id
+			LEFT JOIN course c ON c.id = s.course_id
+			WHERE p.group_code IN (${placeholders})
+			ORDER BY s.created_at DESC, s.id DESC
+		`).all(...codes)
+		res.json(rows)
+	} catch { res.json([]) }
+})
+
 app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
 }); 
