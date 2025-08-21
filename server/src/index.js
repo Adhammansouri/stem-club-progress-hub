@@ -236,6 +236,21 @@ app.get('/api/auth/seed-demo', (req, res) => {
 	try { db.exec(`ALTER TABLE progress_log ADD COLUMN user_id INTEGER`); } catch {}
 })();
 
+// submissions table
+(function migrateSubmissions() {
+  try {
+    db.exec(`CREATE TABLE IF NOT EXISTS submission (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      course_id INTEGER NOT NULL,
+      session_index INTEGER NOT NULL,
+      file_path TEXT NOT NULL,
+      note TEXT,
+      created_at TEXT NOT NULL
+    )`)
+  } catch {}
+})();
+
 function computeCourseDerived(totalLevels, lecturesDone) {
 	const safeTotal = Math.max(1, Number(totalLevels) || 6);
 	const maxLectures = safeTotal * 4;
@@ -475,6 +490,36 @@ app.get('/api/achievements', auth, (req, res) => {
 	const rows = db.prepare('SELECT * FROM achievement WHERE user_id = ? ORDER BY earned_at DESC, id DESC').all(Number(req.userId));
 	res.json(rows);
 });
+
+// submissions endpoints
+app.get('/api/courses/:id/submissions', auth, (req, res) => {
+  const { id } = req.params
+  const rows = db.prepare('SELECT * FROM submission WHERE user_id = ? AND course_id = ? ORDER BY created_at DESC, id DESC').all(Number(req.userId), Number(id))
+  res.json(rows)
+})
+
+app.post('/api/courses/:id/submissions', auth, upload.single('file'), (req, res) => {
+  const { id } = req.params
+  const { session_index, note } = req.body || {}
+  if (!req.file) return res.status(400).json({ error: 'file required' })
+  const pathRel = `/uploads/${req.file.filename}`
+  const info = db.prepare('INSERT INTO submission (user_id, course_id, session_index, file_path, note, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+    .run(Number(req.userId), Number(id), Number(session_index || 0), pathRel, note || null, new Date().toISOString())
+  const row = db.prepare('SELECT * FROM submission WHERE id = ?').get(info.lastInsertRowid)
+  res.json(row)
+})
+
+app.delete('/api/courses/:id/submissions/:sid', auth, (req, res) => {
+  const { id, sid } = req.params
+  const row = db.prepare('SELECT file_path FROM submission WHERE id = ? AND user_id = ? AND course_id = ?').get(Number(sid), Number(req.userId), Number(id))
+  if (!row) return res.json({ success: true })
+  db.prepare('DELETE FROM submission WHERE id = ? AND user_id = ? AND course_id = ?').run(Number(sid), Number(req.userId), Number(id))
+  if (row.file_path) {
+    const abs = path.join(UPLOAD_DIR, path.basename(row.file_path))
+    if (fs.existsSync(abs)) { try { fs.unlinkSync(abs) } catch {} }
+  }
+  res.json({ success: true })
+})
 
 app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
